@@ -1,0 +1,5 @@
+outs:
+- md5: 76f483f30afbb093e90f3425ebae81cb
+  size: 81180464
+  hash: md5
+  path: transactions_2023.csv
