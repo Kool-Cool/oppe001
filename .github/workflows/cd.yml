@@ -1,14 +1,6 @@
-name: CD - Build and Push Docker Image
-
-on:
-  push:
-    branches:
-      - main
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    container: docker://ghcr.io/iterative/cml:0-dvc2-base1
 
     steps:
       - name: Checkout code
@@ -19,6 +11,11 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements-ci.txt
+
+      # Install CML CLI
+      - name: Install CML CLI
+        run: |
+          npm install -g @iterative/cml
 
       # Authenticate to Google Cloud
       - name: Authenticate to Google Cloud
