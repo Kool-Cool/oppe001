@@ -13,6 +13,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    # Install CI dependencies
+    - name: Install CI requirements
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements-ci.txt
+
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v2
       with:
@@ -37,4 +43,3 @@ jobs:
         echo "## 🚀 Docker Image Built & Pushed" > report.md
         echo "- Image tag: ${{ github.sha }}" >> report.md
         cml comment create report.md
-
