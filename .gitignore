@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data files
+*.parquet
+*.db
+*.sqlite
+
+# Logs
+*.log
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# Feast feature store caches
+registry.db
+online_store.db
+

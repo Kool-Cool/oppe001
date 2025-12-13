@@ -26,9 +26,24 @@ start_23 = pd.Timestamp("2023-01-01")
 df_23["event_timestamp"] = start_23 + pd.to_timedelta(df_23["Time"], unit="s")
 df_23["created_timestamp"] = df_23["event_timestamp"]
 
+
+
+## No explicit user_id or entity key:
+## This transaction_id can serve as the Feast entity.
+df_22["transaction_id"] = range(len(df_22))
+df_23["transaction_id"] = range(len(df_23))
+
+
 # Save locally for DVC tracking
 df_22.to_csv("data/v0/transactions_2022.csv", index=False)
 df_23.to_csv("data/v1/transactions_2023.csv", index=False)
+
+
+# Save Parquet for Feast
+df_22.to_parquet("data/v0/transactions_2022.parquet", index=False)
+df_23.to_parquet("data/v1/transactions_2023.parquet", index=False)
+
+
 
 print(df_22.head())
 print(df_23.head())
