@@ -1,0 +1,16 @@
+## training / analysis
+
+
+
+scikit-learn
+xgboost
+mlflow
+dvc
+dvc[gs]
+shap
+fairlearn
+evidently
+matplotlib
+seaborn
+feast
+google-cloud-storage

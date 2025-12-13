@@ -1,0 +1,13 @@
+## FastAPI container
+
+
+fastapi
+uvicorn[standard]
+numpy
+pandas
+scikit-learn
+mlflow
+pydantic
+PyYAML==6.0.1
+joblib
+

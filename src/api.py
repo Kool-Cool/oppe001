@@ -123,3 +123,12 @@ def test_api():
 @app.get("/ping")
 def test_ping():
     return {"message": "PONG"}
+
+
+
+if __name__ == "__main__":
+    import uvicorn
+    from constants import FAST_API_PORT
+
+    uvicorn.run("src.api:app", host="0.0.0.0", port=int(FAST_API_PORT), reload=True)
+
