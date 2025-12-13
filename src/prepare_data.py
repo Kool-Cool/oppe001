@@ -1,11 +1,15 @@
 import pandas as pd
 import os
+from constants import BUCKET_ID
+
 
 # Make sure local folders exist
 os.makedirs("data/v0", exist_ok=True)
 os.makedirs("data/v1", exist_ok=True)
 
-bucket = "gs://oppe2_pract"
+#bucket = "gs://oppe2_pract"
+
+bucket = BUCKET_ID
 
 # Read CSV from GCS (requires gcsfs and authentication)
 df = pd.read_csv(f"{bucket}/transactions.csv")

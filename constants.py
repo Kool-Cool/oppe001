@@ -1,0 +1,4 @@
+
+BUCKET_ID = "gs://oppe2_pract"
+EXTERNAL_IP = "35.225.106.128"
+ML_FLOW_PORT = "5000"
