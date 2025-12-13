@@ -1,63 +1,52 @@
-
-
 name: CD - Build and Push Docker Image
 
-# Define triggers for the workflow
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 on:
   push:
     branches:
-      - main           # runs on pushes to main
-  workflow_dispatch:    # allows manual trigger from Actions tab
+      - main
+  workflow_dispatch:
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
-    # === ADD THIS PERMISSIONS BLOCK ===
-    permissions:
-      contents: read # Needed for checkout
-      pull-requests: write # <-- THIS IS CRITICAL FOR cml comment create
-      issues: write        # <-- Good practice to include
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Install Python CI dependencies
       - name: Install CI requirements
         run: |
           pip install --upgrade pip
           pip install -r requirements-ci.txt
 
-      # Install CML using the official action
       - name: Setup CML
         uses: iterative/setup-cml@v2
 
-      # Authenticate to Google Cloud
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      # Configure Docker for Artifact Registry
       - name: Configure Docker for Artifact Registry
         run: |
           gcloud auth configure-docker --quiet us-central1-docker.pkg.dev
 
-      # Build Docker image
       - name: Build Docker image
         run: |
           docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fraud-api/fraud-detection-api:${{ github.sha }} .
 
-      # Push Docker image
       - name: Push Docker image
         run: |
           docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fraud-api/fraud-detection-api:${{ github.sha }}
 
-      # Post CML report
       - name: CML Report
         env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_TOKEN: ${{ github.token }}
         run: |
           echo "## 🚀 Docker Image Built & Pushed" > report.md
           echo "- Image tag: ${{ github.sha }}" >> report.md
