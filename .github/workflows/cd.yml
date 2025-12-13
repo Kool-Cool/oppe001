@@ -1,3 +1,12 @@
+name: CD - Build and Push Docker Image
+
+# Define triggers for the workflow
+on:
+  push:
+    branches:
+      - main           # runs on pushes to main
+  workflow_dispatch:    # allows manual trigger from Actions tab
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
