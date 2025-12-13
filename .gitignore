@@ -31,3 +31,4 @@ venv/
 registry.db
 online_store.db
 
+data/v1/transactions_2023_predictions.csv
