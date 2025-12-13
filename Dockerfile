@@ -26,6 +26,9 @@ COPY requirements-api.txt .
 RUN pip install --no-cache-dir -r requirements-api.txt
 
 
+# Copy constants.py to /app
+COPY constants.py . 
+
 # Copy application code
 COPY src/ src/
 
