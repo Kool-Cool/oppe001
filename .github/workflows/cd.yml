@@ -1,6 +1,5 @@
 
 
-
 name: CD - Build and Push Docker Image
 
 # Define triggers for the workflow
@@ -13,6 +12,12 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+
+    # === ADD THIS PERMISSIONS BLOCK ===
+    permissions:
+      contents: read # Needed for checkout
+      pull-requests: write # <-- THIS IS CRITICAL FOR cml comment create
+      issues: write        # <-- Good practice to include
 
     steps:
       - name: Checkout code
