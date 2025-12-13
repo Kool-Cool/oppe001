@@ -10,37 +10,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    # Install CI dependencies
-    - name: Install CI requirements
-      run: |
-        pip install --upgrade pip
-        pip install -r requirements-ci.txt
-	pip install git+https://github.com/iterative/cml.git
+      # Install CI dependencies
+      - name: Install CI requirements
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements-ci.txt  
+          pip install git+https://github.com/iterative/cml.git
 
-    - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v2
-      with:
-        credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-    - name: Configure Docker for Artifact Registry
-      run: |
-        gcloud auth configure-docker us-central1-docker.pkg.dev
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker --quiet us-central1-docker.pkg.dev
 
-    - name: Build Docker image
-      run: |
-        docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fraud-api/fraud-detection-api:${{ github.sha }} .
+      - name: Build Docker image
+        run: |
+          docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fraud-api/fraud-detection-api:${{ github.sha }} .
 
-    - name: Push Docker image
-      run: |
-        docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fraud-api/fraud-detection-api:${{ github.sha }}
+      - name: Push Docker image
+        run: |
+          docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/fraud-api/fraud-detection-api:${{ github.sha }}
 
-    - name: CML Report
-      env:
-        REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        echo "## 🚀 Docker Image Built & Pushed" > report.md
-        echo "- Image tag: ${{ github.sha }}" >> report.md
-        cml comment create report.md
+      - name: CML Report
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "## 🚀 Docker Image Built & Pushed" > report.md
+          echo "- Image tag: ${{ github.sha }}" >> report.md
+          cml comment create report.md
