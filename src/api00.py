@@ -1,4 +1,3 @@
-# src/api.py
 from fastapi import FastAPI
 from pydantic import BaseModel
 import pandas as pd
@@ -6,35 +5,12 @@ import mlflow
 import mlflow.sklearn
 import numpy as np
 
-# ----------------------------
-# OpenTelemetry setup
-# ----------------------------
-from opentelemetry import trace
-from opentelemetry.sdk.resources import SERVICE_NAME, Resource
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from constants import EXTERNAL_IP, ML_FLOW_PORT
 
-# Configure tracing
-trace.set_tracer_provider(
-    TracerProvider(resource=Resource.create({SERVICE_NAME: "fraud-api"}))
-)
-tracer = trace.get_tracer(__name__)
-span_processor = BatchSpanProcessor(OTLPSpanExporter())
-trace.get_tracer_provider().add_span_processor(span_processor)
-
-# ----------------------------
-# Import constants
-# ----------------------------
-from constants import EXTERNAL_IP, ML_FLOW_PORT, FAST_API_PORT
-
-# ----------------------------
-# FastAPI app
-# ----------------------------
 app = FastAPI(title="Fraud Detection API", version="1.0")
 
 # ----------------------------
-# Input schema
+# Input schema including transaction_id
 # ----------------------------
 class Transaction(BaseModel):
     transaction_id: int
@@ -77,7 +53,7 @@ model = mlflow.sklearn.load_model("models:/fraud_detection_lr/latest")
 scaler = mlflow.sklearn.load_model("models:/fraud_scaler/latest")
 
 # ----------------------------
-# /predict endpoint
+# /predict endpoint (safe version)
 # ----------------------------
 @app.post("/predict")
 def predict(transaction: Transaction):
@@ -88,16 +64,15 @@ def predict(transaction: Transaction):
     expected_cols = scaler.feature_names_in_.tolist()
     for col in expected_cols:
         if col not in input_df.columns:
-            input_df[col] = 0
+            input_df[col] = 0  # fill missing with 0
 
-    # Reorder columns
+    # Reorder columns to match scaler
     input_df = input_df[expected_cols]
 
-    # Trace the model prediction
-    with tracer.start_as_current_span("model_predict"):
-        input_scaled = scaler.transform(input_df)
-        pred_class = int(model.predict(input_scaled)[0])
-        pred_prob = float(model.predict_proba(input_scaled)[:, 1][0])
+    # Scale and predict
+    input_scaled = scaler.transform(input_df)
+    pred_class = int(model.predict(input_scaled)[0])
+    pred_prob = float(model.predict_proba(input_scaled)[:, 1][0])
 
     return {
         "transaction_id": transaction.transaction_id,
@@ -145,16 +120,15 @@ def test_api():
     }
     return {"dummy_transaction": dummy_transaction, "message": "API is working!"}
 
-# ----------------------------
-# /ping endpoint
-# ----------------------------
 @app.get("/ping")
 def test_ping():
     return {"message": "PONG"}
 
-# ----------------------------
-# Run uvicorn
-# ----------------------------
+
+
 if __name__ == "__main__":
     import uvicorn
+    from constants import FAST_API_PORT
+
     uvicorn.run("src.api:app", host="0.0.0.0", port=int(FAST_API_PORT), reload=True)
+
